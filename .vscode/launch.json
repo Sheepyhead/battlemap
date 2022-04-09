@@ -1,0 +1,45 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug executable 'factory-time'",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin=factory-time",
+          "--package=factory-time"
+        ],
+        "filter": {
+          "name": "factory-time",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in executable 'factory-time'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--bin=factory-time",
+          "--package=factory-time"
+        ],
+        "filter": {
+          "name": "factory-time",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}
