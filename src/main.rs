@@ -1,3 +1,5 @@
+use std::ops::Mul;
+
 use bevy::{input::mouse::MouseMotion, prelude::*};
 use bevy_inspector_egui::WorldInspectorPlugin;
 use heron::prelude::*;
@@ -21,21 +23,13 @@ fn setup(
 ) {
     commands
         .spawn_bundle((
+            Player,
+            Name::new("Player"),
             Transform::default(),
             GlobalTransform::default(),
-            CollisionShape::Cylinder {
-                half_height: 1.0,
-                radius: 0.5,
-            },
-            RigidBody::Dynamic,
-            RotationConstraints::lock(),
-            Name::new("Player"),
         ))
-        .insert_bundle((Player,))
         .with_children(|parent| {
-            let mut camera = PerspectiveCameraBundle::default();
-            camera.transform.translation.y += 0.5;
-            parent.spawn_bundle(camera);
+            parent.spawn_bundle(PerspectiveCameraBundle::new_3d());
         });
 
     commands
@@ -68,23 +62,26 @@ fn setup(
 struct Player;
 
 fn camera_look(
+    mouse_butts: Res<Input<MouseButton>>,
     mut events: EventReader<MouseMotion>,
     mut state: Local<Vec2>,
     player: Query<&Children, With<Player>>,
     mut cameras: Query<&mut Transform, (With<Camera>, With<Parent>)>,
 ) {
-    for MouseMotion { delta } in events.iter() {
-        for children in player.iter() {
-            for child in children.iter() {
-                if let Ok(mut camera) = cameras.get_mut(*child) {
-                    state.x -= delta.y.to_radians();
-                    state.y -= delta.x.to_radians();
+    if mouse_butts.pressed(MouseButton::Right) {
+        for MouseMotion { delta } in events.iter() {
+            for children in player.iter() {
+                for child in children.iter() {
+                    if let Ok(mut camera) = cameras.get_mut(*child) {
+                        state.x -= delta.y.to_radians();
+                        state.y -= delta.x.to_radians();
 
-                    state.x = state.x.clamp(-1.54, 1.54);
+                        state.x = state.x.clamp(-1.54, 1.54);
 
-                    // Order is important to prevent unintended roll
-                    camera.rotation = Quat::from_axis_angle(Vec3::Y, state.y)
-                        * Quat::from_axis_angle(Vec3::X, state.x);
+                        // Order is important to prevent unintended roll
+                        camera.rotation = Quat::from_axis_angle(Vec3::Y, state.y)
+                            * Quat::from_axis_angle(Vec3::X, state.x);
+                    }
                 }
             }
         }
@@ -116,8 +113,15 @@ fn player_move(
             }
 
             velocity = velocity.normalize_or_zero();
+            if velocity != Vec3::ZERO {
+                let local = camera.rotation * velocity;
+                dbg!(
+                    "Global move {velocity}, local move {local} based on {:?}",
+                    camera.rotation.to_euler(EulerRot::XYZ)
+                );
 
-            player.translation += velocity * time.delta_seconds();
+                player.translation += local * time.delta_seconds() * 50.0;
+            }
         }
     }
 }

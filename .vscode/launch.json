@@ -7,15 +7,15 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "Debug executable 'factory-time'",
+      "name": "Debug executable 'battlemap'",
       "cargo": {
         "args": [
           "build",
-          "--bin=factory-time",
-          "--package=factory-time"
+          "--bin=battlemap",
+          "--package=battlemap"
         ],
         "filter": {
-          "name": "factory-time",
+          "name": "battlemap",
           "kind": "bin"
         }
       },
@@ -25,16 +25,16 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "Debug unit tests in executable 'factory-time'",
+      "name": "Debug unit tests in executable 'battlemap'",
       "cargo": {
         "args": [
           "test",
           "--no-run",
-          "--bin=factory-time",
-          "--package=factory-time"
+          "--bin=battlemap",
+          "--package=battlemap"
         ],
         "filter": {
-          "name": "factory-time",
+          "name": "battlemap",
           "kind": "bin"
         }
       },
